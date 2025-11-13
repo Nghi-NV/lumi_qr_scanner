@@ -9,3 +9,8 @@
 * Bounding box and corner points detection
 * Value type detection (URL, email, WiFi, phone, etc.)
 * Platform support: Android (CameraX + ML Kit), iOS/macOS (AVFoundation + Vision)
+* Customizable scanner overlay with ScannerOverlayConfig
+  * Title, descriptions, and custom widgets
+  * Configurable border colors, width, corner length, and border radius
+  * Animated scan line (horizontal or vertical)
+  * Toggle torch button with customizable position and styling
