@@ -95,8 +95,23 @@ class ScannerOverlayConfig {
   /// Size of the torch button
   final double torchButtonSize;
 
-  /// Position of the torch button (top-right corner by default)
-  final Alignment torchButtonPosition;
+  /// Whether to show back button
+  final bool showBackButton;
+
+  /// Callback when back button is pressed
+  final VoidCallback? onBackPressed;
+
+  /// Icon for back button
+  final IconData backButtonIcon;
+
+  /// Color of the back button
+  final Color backButtonColor;
+
+  /// Background color of the back button
+  final Color? backButtonBackgroundColor;
+
+  /// Size of the back button
+  final double backButtonSize;
 
   const ScannerOverlayConfig({
     this.title,
@@ -106,7 +121,7 @@ class ScannerOverlayConfig {
     this.bottomWidget,
     this.borderColor = Colors.green,
     this.borderWidth = 3.0,
-    this.cornerLength = 50.0,
+    this.cornerLength = 30.0,
     this.scanAreaSize = 0.7,
     this.overlayColor = const Color.fromRGBO(0, 0, 0, 0.54),
     this.borderRadius = 16.0,
@@ -120,14 +135,19 @@ class ScannerOverlayConfig {
     this.scanLineColor = Colors.green,
     this.scanLineWidth = 1.0,
     this.scanLineDuration = const Duration(milliseconds: 2000),
-    this.showToggleTorchButton = false,
+    this.showToggleTorchButton = true,
     this.onToggleTorch,
     this.torchOffIcon = Icons.flash_off,
     this.torchOnIcon = Icons.flash_on,
     this.torchButtonColor = Colors.white,
     this.torchButtonBackgroundColor,
     this.torchButtonSize = 48.0,
-    this.torchButtonPosition = Alignment.topRight,
+    this.showBackButton = true,
+    this.onBackPressed,
+    this.backButtonIcon = Icons.arrow_back,
+    this.backButtonColor = Colors.white,
+    this.backButtonBackgroundColor,
+    this.backButtonSize = 48.0,
   });
 
   /// Create a copy with modified fields
@@ -160,7 +180,12 @@ class ScannerOverlayConfig {
     Color? torchButtonColor,
     Color? torchButtonBackgroundColor,
     double? torchButtonSize,
-    Alignment? torchButtonPosition,
+    bool? showBackButton,
+    VoidCallback? onBackPressed,
+    IconData? backButtonIcon,
+    Color? backButtonColor,
+    Color? backButtonBackgroundColor,
+    double? backButtonSize,
   }) {
     return ScannerOverlayConfig(
       title: title ?? this.title,
@@ -194,7 +219,13 @@ class ScannerOverlayConfig {
       torchButtonBackgroundColor:
           torchButtonBackgroundColor ?? this.torchButtonBackgroundColor,
       torchButtonSize: torchButtonSize ?? this.torchButtonSize,
-      torchButtonPosition: torchButtonPosition ?? this.torchButtonPosition,
+      showBackButton: showBackButton ?? this.showBackButton,
+      onBackPressed: onBackPressed ?? this.onBackPressed,
+      backButtonIcon: backButtonIcon ?? this.backButtonIcon,
+      backButtonColor: backButtonColor ?? this.backButtonColor,
+      backButtonBackgroundColor:
+          backButtonBackgroundColor ?? this.backButtonBackgroundColor,
+      backButtonSize: backButtonSize ?? this.backButtonSize,
     );
   }
 }

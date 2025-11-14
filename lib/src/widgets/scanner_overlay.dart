@@ -58,31 +58,32 @@ class _ScannerOverlayState extends State<ScannerOverlay>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Stack(
-        children: [
-          if (widget.config.showOverlay)
-            AnimatedBuilder(
-              animation: _animation,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: ScannerOverlayPainter(
-                    config: widget.config,
-                    animationValue:
-                        widget.config.showScanLine ? _animation.value : 0.0,
-                  ),
-                  size: Size.infinite,
-                );
-              },
-            ),
-          // UI elements (title, descriptions, widgets)
-          _buildUIElements(context),
-          // Toggle torch button
-          if (widget.config.showToggleTorchButton &&
-              widget.config.onToggleTorch != null)
-            _buildToggleTorchButton(context),
-        ],
-      ),
+    return Stack(
+      children: [
+        if (widget.config.showOverlay)
+          AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              return CustomPaint(
+                painter: ScannerOverlayPainter(
+                  config: widget.config,
+                  animationValue:
+                      widget.config.showScanLine ? _animation.value : 0.0,
+                ),
+                size: Size.infinite,
+              );
+            },
+          ),
+        // UI elements (title, descriptions, widgets)
+        _buildUIElements(context),
+        // Back button
+        if (widget.config.showBackButton && widget.config.onBackPressed != null)
+          _buildBackButton(context),
+        // Toggle torch button
+        if (widget.config.showToggleTorchButton &&
+            widget.config.onToggleTorch != null)
+          _buildToggleTorchButton(context),
+      ],
     );
   }
 
@@ -94,85 +95,86 @@ class _ScannerOverlayState extends State<ScannerOverlay>
     final scanAreaTop = (screenSize.height - scanAreaSize) / 2;
     final scanAreaBottom = scanAreaTop + scanAreaSize;
 
-    return Stack(
-      children: [
-        if (widget.config.topWidget != null ||
-            widget.config.title != null ||
-            widget.config.topDescription != null)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: screenSize.height - scanAreaTop,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child:
-                    widget.config.topWidget != null
-                        ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                          child: widget.config.topWidget!,
-                        )
-                        : (widget.config.title != null ||
-                            widget.config.topDescription != null)
-                        ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (widget.config.title != null)
-                                Text(
-                                  widget.config.title!,
-                                  style:
-                                      widget.config.titleStyle ??
-                                      Theme.of(
-                                        context,
-                                      ).textTheme.headlineSmall?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              if (widget.config.title != null &&
-                                  widget.config.topDescription != null)
-                                const SizedBox(height: 8),
-                              if (widget.config.topDescription != null)
-                                Text(
-                                  widget.config.topDescription!,
-                                  style:
-                                      widget.config.topDescriptionStyle ??
-                                      Theme.of(context).textTheme.bodyMedium
-                                          ?.copyWith(color: Colors.white),
-                                  textAlign: TextAlign.center,
-                                ),
-                            ],
-                          ),
-                        )
-                        : const SizedBox.shrink(),
+    return SafeArea(
+      child: Stack(
+        children: [
+          if (widget.config.topWidget != null ||
+              widget.config.title != null ||
+              widget.config.topDescription != null)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: screenSize.height - scanAreaTop,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child:
+                      widget.config.topWidget != null
+                          ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0,
+                            ),
+                            child: widget.config.topWidget!,
+                          )
+                          : (widget.config.title != null ||
+                              widget.config.topDescription != null)
+                          ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (widget.config.title != null)
+                                  Text(
+                                    widget.config.title!,
+                                    style:
+                                        widget.config.titleStyle ??
+                                        Theme.of(
+                                          context,
+                                        ).textTheme.headlineSmall?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                if (widget.config.title != null &&
+                                    widget.config.topDescription != null)
+                                  const SizedBox(height: 8),
+                                if (widget.config.topDescription != null)
+                                  Text(
+                                    widget.config.topDescription!,
+                                    style:
+                                        widget.config.topDescriptionStyle ??
+                                        Theme.of(context).textTheme.bodyMedium
+                                            ?.copyWith(color: Colors.white),
+                                    textAlign: TextAlign.center,
+                                  ),
+                              ],
+                            ),
+                          )
+                          : const SizedBox.shrink(),
+                ),
               ),
             ),
-          ),
-        // Bottom content - positioned below scan area
-        if (widget.config.bottomWidget != null ||
-            widget.config.bottomDescription != null)
-          Positioned(
-            top: scanAreaBottom,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child:
-                    widget.config.bottomWidget != null
-                        ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                          child: widget.config.bottomWidget!,
-                        )
-                        : widget.config.bottomDescription != null
-                        ? Padding(
+          // Bottom content - positioned below scan area
+          if (widget.config.bottomWidget != null ||
+              widget.config.bottomDescription != null)
+            Positioned(
+              top: scanAreaBottom,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Column(
+                    children: [
+                      if (widget.config.bottomDescription != null)
+                        Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24.0),
                           child: Text(
                             widget.config.bottomDescription!,
@@ -182,81 +184,89 @@ class _ScannerOverlayState extends State<ScannerOverlay>
                                     ?.copyWith(color: Colors.white),
                             textAlign: TextAlign.center,
                           ),
-                        )
-                        : const SizedBox.shrink(),
+                        ),
+                      if (widget.config.bottomWidget != null)
+                        widget.config.bottomWidget!,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackButton(BuildContext context) {
+    return Positioned(
+      top: 0,
+      left: 0,
+      child: SafeArea(
+        child: Material(
+          color: widget.config.backButtonBackgroundColor ?? Colors.transparent,
+          shape: const CircleBorder(),
+          child: InkWell(
+            onTap: () {
+              widget.config.onBackPressed?.call();
+            },
+            borderRadius: BorderRadius.circular(
+              widget.config.backButtonSize / 2,
+            ),
+            child: Container(
+              width: widget.config.backButtonSize,
+              height: widget.config.backButtonSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                    widget.config.backButtonBackgroundColor ??
+                    Colors.transparent,
+              ),
+              child: Icon(
+                widget.config.backButtonIcon,
+                color: widget.config.backButtonColor,
+                size: widget.config.backButtonSize * 0.5,
               ),
             ),
           ),
-      ],
+        ),
+      ),
     );
   }
 
   Widget _buildToggleTorchButton(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final screenSize = mediaQuery.size;
-
-    // Calculate position based on alignment
-    double? top, bottom, left, right;
-    final alignment = widget.config.torchButtonPosition;
-
-    if (alignment == Alignment.topLeft) {
-      top = 16.0;
-      left = 16.0;
-    } else if (alignment == Alignment.topRight) {
-      top = 16.0;
-      right = 16.0;
-    } else if (alignment == Alignment.bottomLeft) {
-      bottom = 16.0;
-      left = 16.0;
-    } else if (alignment == Alignment.bottomRight) {
-      bottom = 16.0;
-      right = 16.0;
-    } else if (alignment == Alignment.topCenter) {
-      top = 16.0;
-      left = (screenSize.width - widget.config.torchButtonSize) / 2;
-    } else if (alignment == Alignment.bottomCenter) {
-      bottom = 16.0;
-      left = (screenSize.width - widget.config.torchButtonSize) / 2;
-    } else {
-      top = 16.0;
-      right = 16.0;
-    }
-
     return Positioned(
-      top: top,
-      bottom: bottom,
-      left: left,
-      right: right,
-      child: Material(
-        color:
-            widget.config.torchButtonBackgroundColor ??
-            Colors.black.withValues(alpha: 0.2),
-        shape: const CircleBorder(),
-        child: InkWell(
-          onTap: () {
-            setState(() {
-              _isTorchOn = !_isTorchOn;
-            });
-            widget.config.onToggleTorch?.call();
-          },
-          borderRadius: BorderRadius.circular(
-            widget.config.torchButtonSize / 2,
-          ),
-          child: Container(
-            width: widget.config.torchButtonSize,
-            height: widget.config.torchButtonSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color:
-                  widget.config.torchButtonBackgroundColor ??
-                  Colors.black.withValues(alpha: 0.2),
+      top: 0,
+      right: 0,
+      child: SafeArea(
+        child: Material(
+          color: widget.config.torchButtonBackgroundColor ?? Colors.transparent,
+          shape: const CircleBorder(),
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                _isTorchOn = !_isTorchOn;
+              });
+              widget.config.onToggleTorch?.call();
+            },
+            borderRadius: BorderRadius.circular(
+              widget.config.torchButtonSize / 2,
             ),
-            child: Icon(
-              _isTorchOn
-                  ? widget.config.torchOnIcon
-                  : widget.config.torchOffIcon,
-              color: widget.config.torchButtonColor,
-              size: widget.config.torchButtonSize * 0.5,
+            child: Container(
+              width: widget.config.torchButtonSize,
+              height: widget.config.torchButtonSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                    widget.config.torchButtonBackgroundColor ??
+                    Colors.transparent,
+              ),
+              child: Icon(
+                _isTorchOn
+                    ? widget.config.torchOnIcon
+                    : widget.config.torchOffIcon,
+                color: widget.config.torchButtonColor,
+                size: widget.config.torchButtonSize * 0.5,
+              ),
             ),
           ),
         ),

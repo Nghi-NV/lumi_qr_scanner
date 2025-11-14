@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lumi_qr_scanner/lumi_qr_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -312,14 +313,19 @@ class ScannerPage extends StatefulWidget {
 
 class _ScannerPageState extends State<ScannerPage> {
   QRScannerController? _controller;
-  bool _isTorchOn = false;
   bool _hasPermission = false;
-  String? _scannedCode;
 
   @override
   void initState() {
     super.initState();
     _checkPermission();
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
   }
 
   Future<void> _checkPermission() async {
@@ -339,109 +345,172 @@ class _ScannerPageState extends State<ScannerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Scan QR Code'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: Icon(_isTorchOn ? Icons.flash_on : Icons.flash_off),
-            onPressed: () {
-              _controller?.toggleTorch();
-              setState(() {
-                _isTorchOn = !_isTorchOn;
-              });
-            },
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   title: const Text('Scan QR Code'),
+      //   backgroundColor: Colors.black,
+      //   foregroundColor: Colors.white,
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(_isTorchOn ? Icons.flash_on : Icons.flash_off),
+      //       onPressed: () {
+      //         _controller?.toggleTorch();
+      //         setState(() {
+      //           _isTorchOn = !_isTorchOn;
+      //         });
+      //       },
+      //     ),
+      //   ],
+      // ),
+      // extendBodyBehindAppBar: true,
       body:
           !_hasPermission
               ? const Center(
                 child: Text('Camera permission is required to scan QR codes'),
               )
-              : Stack(
-                children: [
-                  QRScannerView(
-                    config: const ScannerConfig(
-                      formats: [BarcodeFormat.qrCode],
-                      autoFocus: true,
-                      vibrateOnSuccess: true,
-                      autoPauseAfterScan: true,
-                    ),
-                    onScannerCreated: (controller) {
-                      _controller = controller;
-                    },
-                    onBarcodeScanned: (barcode) {
-                      setState(() {
-                        _scannedCode = barcode.rawValue;
-                      });
-                      _showResultDialog(barcode);
-                    },
-                    overlayConfig: ScannerOverlayConfig(
-                      title: 'Scan QR Code',
-                      topDescription: 'Position the QR code within the frame',
-                      bottomDescription:
-                          'Keep the code steady for best results',
-                      showToggleTorchButton: true,
-                      onToggleTorch: () {
-                        _controller?.toggleTorch();
-                      },
-                      // borderColor: Colors.green,
-                      // borderWidth: 2.0,
-                      // cornerLength: 30.0,
-                      // scanAreaSize: 0.7,
-                      // showScanLine: true,
-                      // scanLineDirection: ScanLineDirection.vertical,
-                      // scanLineColor: Colors.green,
-                      // scanLineWidth: 2.0,
-                      // scanLineDuration: Duration(milliseconds: 2000),
+              : QRScannerView(
+                config: const ScannerConfig(
+                  formats: [BarcodeFormat.qrCode],
+                  autoFocus: true,
+                  vibrateOnSuccess: true,
+                  autoPauseAfterScan: true,
+                  beepOnSuccess: true,
+                ),
+                onScannerCreated: (controller) {
+                  _controller = controller;
+                },
+                onBarcodeScanned: (barcode) {
+                  setState(() {});
+                  _showResultDialog(barcode);
+                },
+
+                overlayConfig: ScannerOverlayConfig(
+                  title: 'Scan QR Code',
+                  topDescription: 'Position the QR code within the frame',
+                  bottomDescription: 'Keep the code steady for best results',
+                  showBackButton: true,
+                  onBackPressed: () {
+                    Navigator.pop(context);
+                  },
+                  // showToggleTorchButton: true,
+                  onToggleTorch: () {
+                    _controller?.toggleTorch();
+                  },
+                  bottomWidget: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: ElevatedButton.icon(
+                      onPressed: _selectPhotoAndScan,
+                      icon: const Icon(Icons.photo_library),
+                      label: const Text('Select Photo'),
                     ),
                   ),
-                  if (_scannedCode != null)
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        color: Colors.black87,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Last scanned:',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _scannedCode!,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                _controller?.resumeScanning();
-                                setState(() {
-                                  _scannedCode = null;
-                                });
-                              },
-                              child: const Text('Scan Again'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
+                  // borderColor: Colors.green,
+                  // borderWidth: 2.0,
+                  // cornerLength: 30.0,
+                  // scanAreaSize: 0.7,
+                  // showScanLine: true,
+                  // scanLineDirection: ScanLineDirection.vertical,
+                  // scanLineColor: Colors.green,
+                  // scanLineWidth: 2.0,
+                  // scanLineDuration: Duration(milliseconds: 2000),
+                ),
               ),
     );
+  }
+
+  Future<void> _selectPhotoAndScan() async {
+    final picker = ImagePicker();
+    try {
+      final image = await picker.pickImage(source: ImageSource.gallery);
+
+      if (image == null) {
+        debugPrint('No image selected');
+        return;
+      }
+
+      if (!mounted) return;
+
+      debugPrint('Image selected: ${image.path}');
+
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Scan the selected image for QR codes
+      final barcodes = await LumiQrScanner.instance.scanImagePath(image.path);
+
+      if (!mounted) return;
+
+      // Close loading dialog
+      Navigator.pop(context);
+
+      debugPrint('Found ${barcodes.length} barcodes');
+
+      if (barcodes.isEmpty) {
+        // Show error message if no QR code found
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'No QR code found in image',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text('Possible reasons:', style: TextStyle(fontSize: 12)),
+                Text(
+                  '• QR code is too small or blurry',
+                  style: TextStyle(fontSize: 11),
+                ),
+                Text(
+                  '• Poor contrast or lighting',
+                  style: TextStyle(fontSize: 11),
+                ),
+                Text(
+                  '• QR code is damaged or incomplete',
+                  style: TextStyle(fontSize: 11),
+                ),
+                Text(
+                  '• Try a different image or angle',
+                  style: TextStyle(fontSize: 11),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red.shade700,
+            duration: const Duration(seconds: 6),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        // Show result dialog with first barcode found
+        _showResultDialog(barcodes.first);
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Error scanning image: $e');
+      debugPrint('Stack trace: $stackTrace');
+
+      if (mounted) {
+        // Close loading dialog if open
+        Navigator.of(
+          context,
+          rootNavigator: true,
+        ).popUntil((route) => route.isFirst);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   void _showResultDialog(Barcode barcode) {
@@ -580,6 +649,14 @@ class _ScannerPageState extends State<ScannerPage> {
 
   @override
   void dispose() {
+    // Khôi phục status bar về mặc định khi rời trang
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
     _controller?.dispose();
     super.dispose();
   }
