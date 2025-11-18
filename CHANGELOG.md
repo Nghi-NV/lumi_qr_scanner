@@ -1,3 +1,6 @@
+## 0.0.4
+* Update flutter sdk version to >=3.0.0 <4.0.0
+
 ## 0.0.3
 
 * Add back button to scanner overlay (configurable, default enabled)
