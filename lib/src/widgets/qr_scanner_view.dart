@@ -148,7 +148,6 @@ class _QRScannerViewState extends State<QRScannerView> {
 
 /// Controller for the QR scanner
 class QRScannerController {
-  // Platform view ID (stored for potential future use)
   // ignore: unused_field
   int? _platformViewId;
   MethodChannel? _channel;
@@ -158,7 +157,10 @@ class QRScannerController {
   bool _isDisposed = false;
   bool _isScanning = false;
 
-  QRScannerController({required this.config, this.onBarcodeScanned});
+  QRScannerController({
+    required this.config,
+    this.onBarcodeScanned,
+  });
 
   void _setPlatformViewId(int id) {
     _platformViewId = id;
@@ -172,12 +174,11 @@ class QRScannerController {
     switch (call.method) {
       case 'onBarcodeScanned':
         try {
-          // Convert Map<Object?, Object?> to Map<String, dynamic>
           final Map<String, dynamic> barcodeMap = _convertMap(call.arguments);
           final barcode = Barcode.fromJson(barcodeMap);
           onBarcodeScanned?.call(barcode);
         } catch (e) {
-          // Error processing barcode, ignore
+          // Error processing barcode
         }
         break;
     }

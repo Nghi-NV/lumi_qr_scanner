@@ -1,3 +1,14 @@
+## 0.1.1
+
+### Android - QR Scanning Optimization
+* **Improved scanning distance**: Increase ImageAnalysis resolution target to 1920×1080 using `ResolutionStrategy` with fallback for better small QR code detection at distance
+* **Enhanced auto-focus**: Force `AF_MODE_CONTINUOUS_PICTURE` via `Camera2Interop` for stable continuous auto-focus
+* **Faster frame processing**: Remove scan delay throttling, use `@Volatile isProcessing` flag for maximum frame throughput
+* **Better image format**: Use `OUTPUT_IMAGE_FORMAT_YUV_420_888` for more efficient ML Kit processing
+* **Camera stability**: Replace deprecated `setTargetResolution()` with `ResolutionSelector` to prevent camera configuration timeouts
+* **Accurate barcode coordinates**: Send actual camera image dimensions with rotation handling for correct bounding box mapping
+* **User interaction**: Add pinch-to-zoom and tap-to-focus support
+
 ## 0.1.0
 * Fix bug 16kb
 
